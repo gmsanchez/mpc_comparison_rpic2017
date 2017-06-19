@@ -96,6 +96,7 @@ nlpoptions = {
         "print_level" : 0,
         "max_cpu_time" : 60,
         "linear_solver" : "ma27",
+        "max_iter" : 100,
     },
     "print_time" : False,
     
