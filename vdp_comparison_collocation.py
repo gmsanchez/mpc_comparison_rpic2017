@@ -51,12 +51,13 @@ def get_collocation_weights(tau_root):
     return [C,D,B]
 
 
-def get_collocation_args(k,var):
+def get_collocation_args(k,var,include0=True,include1=False):
     Nx = var['x'][k].shape[0]
-    colloc_args = []
-    colloc_args += [var['x'][k]]
-    colloc_args += casadi.blocksplit(var['xc'][k], Nx, 1)[0]
-    # colloc_args += [var['x'][k+1]]
+    colloc_args = casadi.blocksplit(var['xc'][k], Nx, 1)[0]
+    if include0:
+        colloc_args = [var['x'][k]] + colloc_args
+    if include1:
+        colloc_args = colloc_args + [var['x'][k + 1]]
     return colloc_args
 
 # Define model and get simulator.
@@ -86,8 +87,7 @@ intoptions = {
 vdp = casadi.integrator("int_ode",
     "cvodes", ode_integrator, intoptions)
 
-# Then get nonlinear casadi functions
-# and RK4 discretization.
+# Then get nonlinear casadi functions.
 ode_casadi = casadi.Function(
     "ode",[x,u],[ode(x,u)])
 
@@ -235,3 +235,7 @@ ax.set_xlabel("Iteration")
 ax.set_ylabel("Execution time [ms]")
 fig.tight_layout(pad=.5)
 fig.show()
+
+# Uncomment the following lines if you want the plot to block
+# the Python interpreter and stay open.
+# plt.show()

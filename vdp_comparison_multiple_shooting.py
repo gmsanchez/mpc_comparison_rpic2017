@@ -170,3 +170,7 @@ ax.set_xlabel("Iteration")
 ax.set_ylabel("Execution time [ms]")
 fig.tight_layout(pad=.5)
 fig.show()
+
+# Uncomment the following lines if you want the plot to block
+# the Python interpreter and stay open.
+# plt.show()
