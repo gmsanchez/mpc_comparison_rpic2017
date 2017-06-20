@@ -40,7 +40,8 @@ def get_collocation_weights(tau_root):
         # Evaluate the polynomial at the final time to get the coefficients of the continuity equation
         D[j] = p(1.0)
 
-        # Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
+        # Evaluate the time derivative of the polynomial at all collocation points
+        # to get the coefficients of the continuity equation
         pder = np.polyder(p)
         for r in range(d):
             C[j, r] = pder(tau_root[r])
