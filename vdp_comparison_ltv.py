@@ -154,7 +154,7 @@ else:
         "ipopt" : {
             "print_level" : 0,
             "max_cpu_time" : 60,
-            "linear_solver" : "ma27",
+            "linear_solver" : "ma27",  # Comment this line if you don't have MA27
             "max_iter" : 100,
             "jac_c_constant": "yes",
             "jac_d_constant": "yes",
