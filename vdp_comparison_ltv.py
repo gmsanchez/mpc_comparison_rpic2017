@@ -48,7 +48,7 @@ def _calc_lin_disc_wrapper_for_mp_map(item):
     return Ai, Bi, Ei
 
 # Set to True if you want to create a QP solver (qpOASES) and
-#  to False if you want to use a NLP solver (IPOPT).
+# to False if you want to use a NLP solver (IPOPT).
 isQP = True
 
 # Set to True if you want to update all the LTV parameters
