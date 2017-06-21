@@ -47,8 +47,13 @@ def _calc_lin_disc_wrapper_for_mp_map(item):
     [Ai[:], Bi[:], _, Ei[:]] = c2d(A=Ai, B=Bi, Delta=_Delta, f=Ei)
     return Ai, Bi, Ei
 
-
+# Set to True if you want to create a QP solver (qpOASES) and
+#  to False if you want to use a NLP solver (IPOPT).
 isQP = True
+
+# Set to True if you want to update all the LTV parameters
+# in the optimization problem and to False if you want to shift
+# previous parameters and update only the last one.
 updateLTV = False
 
 # Define model and get simulator.
