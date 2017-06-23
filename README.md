@@ -14,22 +14,25 @@ First, you need to create a directory to contain your virtual environments and t
 ~$ cd virtualenvs
 ~/virtualenvs$ virtualenv mpc_rpic2017
 ```
-To begin using the virtual environment, it needs to be activated:
+Now, the virtual environment needs to be activated:
 ```
 ~/virtualenvs$ source mpc_rpic2017/bin/activate
 ```
 The name of the current virtual environment will now appear on the left of the prompt to let you know that it’s active. From now on, any package that you install using pip will be placed in the `mpc_rpic2017` folder, isolated from the global Python installation.
 
-Now, we can install the required dependencies
+Download the file `virtualenv_requirements.txt` and place it in the current folder. Then, we can install the required dependencies
 ```
 ~/virtualenvs$ pip install -r virtualenv_requirements.txt
 ```
-and test the provided code.
+and test the provided code. For example, to test the script `vdp_comparison_collocation.py`, you can run
+```
+$ python vdp_comparison_collocation.py
+```
 
 Once you are done working in the virtual environment for the moment, you can deactivate it:
 ```
 $ deactivate
 ```
-This puts you back to the system’s default Python interpreter with all its installed libraries.
+Now running `python` will just use the system’s default Python interpreter, which is not modified by anything done while being inside the virtual environment.
 
-To delete a virtual environment, just delete its folder. (In this case, it would be `rm -rf mpc_rpic2017`).
+To delete a virtual environment, just delete the corresponding folder. (In this case, it would be `rm -r mpc_rpic2017`).
