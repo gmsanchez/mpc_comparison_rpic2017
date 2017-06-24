@@ -20,7 +20,12 @@ Now, the virtual environment needs to be activated:
 ```
 The name of the current virtual environment will now appear on the left of the prompt to let you know that it’s active. From now on, any package that you install using pip will be placed in the `mpc_rpic2017` folder, isolated from the global Python installation.
 
-Download the file `virtualenv_requirements.txt` and place it in the current folder. Then, we can install the required dependencies
+We need to make sure that the pip version contained in the virtual environment is up to date:
+```
+$ pip install -U pip
+```
+
+Now download the file `virtualenv_requirements.txt` and place it in the current folder. Then, we can install the required dependencies
 ```
 ~/virtualenvs$ pip install -r virtualenv_requirements.txt
 ```
