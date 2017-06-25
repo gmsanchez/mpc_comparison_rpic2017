@@ -135,7 +135,8 @@ for t in range(Nsim):
     # Print stats.
     print "%d: %s in %.4f seconds" % (t,status, t1 - t0)
     if status == "Invalid_Option":
-        print 'You may have left the line "linear_solver" : "ma27" uncommented even though you didn\' install the HSL MA27 linear solver.'
+        print 'You may have left the line "linear_solver" : "ma27" uncommented even though ' \
+              'you didn\'t install the HSL MA27 linear solver.'
         exit(1)
     u[t,:] = optvar["u",0,:]
     iter_time[t] = t1-t0   
