@@ -9,6 +9,18 @@ import matplotlib.pyplot as plt
 import time
 import scipy.linalg
 
+# Set to True if you want to create a QP solver (qpOASES) and
+# to False if you want to use a NLP solver (IPOPT).
+isQP = True
+
+# Set to True if you want to update all the LTV parameters
+# in the optimization problem and to False if you want to shift
+# previous parameters and update only the last one.
+updateLTV = False
+
+# Set to True if you want to get plots at the end of the simulation.
+plot_results = False
+
 def c2d(A, B, Delta, Bp=None, f=None, asdict=False):
     """
     Discretizes affine system (A, B, Bp, f) with timestep Delta.
@@ -46,15 +58,6 @@ def _calc_lin_disc_wrapper_for_mp_map(item):
     # [Ai[:], Bi[:], Gi[:], Ei[:]] = c2d(A=Ai, B=Bi, Delta=_Delta, Bp=Gi, f=Ei)
     [Ai[:], Bi[:], _, Ei[:]] = c2d(A=Ai, B=Bi, Delta=_Delta, f=Ei)
     return Ai, Bi, Ei
-
-# Set to True if you want to create a QP solver (qpOASES) and
-# to False if you want to use a NLP solver (IPOPT).
-isQP = True
-
-# Set to True if you want to update all the LTV parameters
-# in the optimization problem and to False if you want to shift
-# previous parameters and update only the last one.
-updateLTV = False
 
 # Define model and get simulator.
 Delta = .25
@@ -222,6 +225,9 @@ for t in range(Nsim):
     t1 = time.time()
     # Print stats.
     print "%d: %s in %.4f seconds" % (t,status, t1 - t0)
+    if status == "Invalid_Option":
+            print 'You may have left the line "linear_solver" : "ma27" uncommented even though you didn\' install the HSL MA27 linear solver.'
+            exit(1)
     u[t,:] = optvar["u",0,:]
     iter_time[t] = t1-t0   
     
@@ -231,37 +237,33 @@ for t in range(Nsim):
     out = vdp(**vdpargs)
     x[t+1,:] = np.array(
         out["xf"]).flatten()
-    
-# Plots.
-fig = plt.figure()
-numrows = max(Nx,Nu)
-numcols = 2
 
-# u plots. Need to repeat last element
-# for stairstep plot.
-u = np.concatenate((u,u[-1:,:]))
-for i in range(Nu):
-    ax = fig.add_subplot(numrows,
-        numcols,numcols*(i+1))
-    ax.step(times,u[:,i],"-k",where="post")
-    ax.set_xlabel("Time")
-    ax.set_ylabel("Control %d" % (i + 1))
+if plot_results:
+    fig = plt.figure()
+    numrows = max(Nx,Nu)
+    numcols = 2
 
-# x plots.    
-for i in range(Nx):
-    ax = fig.add_subplot(numrows,
-        numcols,numcols*(i+1) - 1)
-    ax.plot(times,x[:,i],"-k",label="System")
-    ax.set_xlabel("Time")
-    ax.set_ylabel("State %d" % (i + 1))
+    # u plots. Need to repeat last element
+    # for stairstep plot.
+    u = np.concatenate((u,u[-1:,:]))
+    for i in range(Nu):
+        ax = fig.add_subplot(numrows,
+            numcols,numcols*(i+1))
+        ax.step(times,u[:,i],"-k",where="post")
+        ax.set_xlabel("Time")
+        ax.set_ylabel("Control %d" % (i + 1))
 
-ax = fig.add_subplot(numrows,numcols,4)
-ax.plot(iter_time*1E3,".-k")
-ax.set_xlabel("Iteration")
-ax.set_ylabel("Execution time [ms]")
-fig.tight_layout(pad=.5)
-fig.show()
+    # x plots.    
+    for i in range(Nx):
+        ax = fig.add_subplot(numrows,
+            numcols,numcols*(i+1) - 1)
+        ax.plot(times,x[:,i],"-k",label="System")
+        ax.set_xlabel("Time")
+        ax.set_ylabel("State %d" % (i + 1))
 
-# Uncomment the following lines if you want the plot to block
-# the Python interpreter and stay open.
-# plt.show()
+    ax = fig.add_subplot(numrows,numcols,4)
+    ax.plot(iter_time*1E3,".-k")
+    ax.set_xlabel("Iteration")
+    ax.set_ylabel("Execution time [ms]")
+    fig.tight_layout(pad=.5)
+    plt.show()

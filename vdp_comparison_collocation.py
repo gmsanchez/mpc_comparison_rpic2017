@@ -8,6 +8,8 @@ import matplotlib.pyplot as plt
 
 import time
 
+# Set to True if you want to get plots at the end of the simulation.
+plot_results = False
 
 def get_collocation_points(d,include0=True,include1=False):
     tau_root = casadi.collocation_points(d, 'legendre')
@@ -197,6 +199,9 @@ for t in range(Nsim):
     t1 = time.time()
     # Print stats.
     print "%d: %s in %.4f seconds" % (t,status, t1 - t0)
+    if status == "Invalid_Option":
+        print 'You may have left the line "linear_solver" : "ma27" uncommented even though you didn\' install the HSL MA27 linear solver.'
+        exit(1)
     u[t,:] = optvar["u",0,:]
     iter_time[t] = t1-t0   
     
@@ -207,36 +212,34 @@ for t in range(Nsim):
     x[t+1,:] = np.array(
         out["xf"]).flatten()
     
-# Plots.
-fig = plt.figure()
-numrows = max(Nx,Nu)
-numcols = 2
+if plot_results:
+    # Plots.
+    fig = plt.figure()
+    numrows = max(Nx,Nu)
+    numcols = 2
 
-# u plots. Need to repeat last element
-# for stairstep plot.
-u = np.concatenate((u,u[-1:,:]))
-for i in range(Nu):
-    ax = fig.add_subplot(numrows,
-        numcols,numcols*(i+1))
-    ax.step(times,u[:,i],"-k",where="post")
-    ax.set_xlabel("Time")
-    ax.set_ylabel("Control %d" % (i + 1))
+    # u plots. Need to repeat last element
+    # for stairstep plot.
+    u = np.concatenate((u,u[-1:,:]))
+    for i in range(Nu):
+        ax = fig.add_subplot(numrows,
+            numcols,numcols*(i+1))
+        ax.step(times,u[:,i],"-k",where="post")
+        ax.set_xlabel("Time")
+        ax.set_ylabel("Control %d" % (i + 1))
 
-# x plots.    
-for i in range(Nx):
-    ax = fig.add_subplot(numrows,
-        numcols,numcols*(i+1) - 1)
-    ax.plot(times,x[:,i],"-k",label="System")
-    ax.set_xlabel("Time")
-    ax.set_ylabel("State %d" % (i + 1))
+    # x plots.    
+    for i in range(Nx):
+        ax = fig.add_subplot(numrows,
+            numcols,numcols*(i+1) - 1)
+        ax.plot(times,x[:,i],"-k",label="System")
+        ax.set_xlabel("Time")
+        ax.set_ylabel("State %d" % (i + 1))
 
-ax = fig.add_subplot(numrows,numcols,4)
-ax.plot(iter_time*1E3,".-k")
-ax.set_xlabel("Iteration")
-ax.set_ylabel("Execution time [ms]")
-fig.tight_layout(pad=.5)
-fig.show()
+    ax = fig.add_subplot(numrows,numcols,4)
+    ax.plot(iter_time*1E3,".-k")
+    ax.set_xlabel("Iteration")
+    ax.set_ylabel("Execution time [ms]")
+    fig.tight_layout(pad=.5)
+    plt.show()
 
-# Uncomment the following lines if you want the plot to block
-# the Python interpreter and stay open.
-# plt.show()
