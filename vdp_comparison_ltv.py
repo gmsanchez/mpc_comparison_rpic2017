@@ -51,9 +51,12 @@ def c2d(A, B, Delta, Bp=None, f=None, asdict=False):
 def _calc_lin_disc_wrapper_for_mp_map(item):
     """ Function wrapper for map or multiprocessing.map . """
     _fi, _xi, _ui, _Delta = item
-    Ai = _fi.jacobian_old(0, 0)(_xi, _ui)[0].full()
-    Bi = _fi.jacobian_old(1, 0)(_xi, _ui)[0].full()
+    # Ai = _fi.jacobian_old(0, 0)(_xi, _ui)[0].full()
+    Ai = _fi.jacobian()(_xi, _ui, 0)[0].full()
+    # Bi = _fi.jacobian_old(1, 0)(_xi, _ui)[0].full()
+    Bi = _fi.jacobian()(_xi, _ui, 0)[1].full()
     # Gi = _fi.jacobian_old(2, 0)(_xi, _ui)[0].full()
+    # Gi = _fi.jacobian()(_xi, _ui, 0)[2].full()
     Ei = _fi(_xi, _ui).full().ravel() - Ai.dot(_xi).ravel() - Bi.dot(_ui).ravel()  # - Gi.dot(_wi).ravel()
     # [Ai[:], Bi[:], Gi[:], Ei[:]] = c2d(A=Ai, B=Bi, Delta=_Delta, Bp=Gi, f=Ei)
     [Ai[:], Bi[:], _, Ei[:]] = c2d(A=Ai, B=Bi, Delta=_Delta, f=Ei)
