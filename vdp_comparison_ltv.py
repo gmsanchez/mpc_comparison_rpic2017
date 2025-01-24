@@ -51,9 +51,9 @@ def c2d(A, B, Delta, Bp=None, f=None, asdict=False):
 def _calc_lin_disc_wrapper_for_mp_map(item):
     """ Function wrapper for map or multiprocessing.map . """
     _fi, _xi, _ui, _Delta = item
-    Ai = _fi.jacobian(0, 0)(_xi, _ui)[0].full()
-    Bi = _fi.jacobian(1, 0)(_xi, _ui)[0].full()
-    # Gi = _fi.jacobian(2, 0)(_xi, _ui)[0].full()
+    Ai = _fi.jacobian_old(0, 0)(_xi, _ui)[0].full()
+    Bi = _fi.jacobian_old(1, 0)(_xi, _ui)[0].full()
+    # Gi = _fi.jacobian_old(2, 0)(_xi, _ui)[0].full()
     Ei = _fi(_xi, _ui).full().ravel() - Ai.dot(_xi).ravel() - Bi.dot(_ui).ravel()  # - Gi.dot(_wi).ravel()
     # [Ai[:], Bi[:], Gi[:], Ei[:]] = c2d(A=Ai, B=Bi, Delta=_Delta, Bp=Gi, f=Ei)
     [Ai[:], Bi[:], _, Ei[:]] = c2d(A=Ai, B=Bi, Delta=_Delta, f=Ei)
@@ -80,10 +80,9 @@ ode_integrator = dict(x=x,p=u,
 intoptions = {
     "abstol" : 1e-8,
     "reltol" : 1e-8,
-    "tf" : Delta,
 }
 vdp = casadi.integrator("int_ode",
-    "cvodes", ode_integrator, intoptions)
+    "cvodes", ode_integrator, 0, Delta, intoptions)
 
 # Then get nonlinear casadi functions.
 ode_casadi = casadi.Function(
@@ -162,7 +161,7 @@ else:
         "ipopt" : {
             "print_level" : 0,
             "max_cpu_time" : 60,
-            "linear_solver" : "ma27",  # Comment this line if you don't have MA27
+            # "linear_solver" : "ma27",  # Comment this line if you don't have MA27
             "max_iter" : 100,
             "jac_c_constant": "yes",
             "jac_d_constant": "yes",
@@ -209,10 +208,10 @@ for t in range(Nsim):
         parguess["Ad", :],\
         parguess["Bd", :],\
         parguess["fd", :] = zip(*map(_calc_lin_disc_wrapper_for_mp_map,
-                                     zip([ode_casadi for _k in xrange(Nt)],
+                                     zip([ode_casadi for _k in range(Nt)],
                                          optvar["x",:-1],
                                          optvar["u"],
-                                         [Delta for _k in xrange(Nt)])))
+                                         [Delta for _k in range(Nt)])))
     else:
         # Shift previous parameters and update the last one.
         parguess["Ad",0:-1] = parguess["Ad",1:]
@@ -224,10 +223,10 @@ for t in range(Nsim):
 
     t1 = time.time()
     # Print stats.
-    print "%d: %s in %.4f seconds" % (t,status, t1 - t0)
+    print ("%d: %s in %.4f seconds" % (t,status, t1 - t0))
     if status == "Invalid_Option":
-        print 'You may have left the line "linear_solver" : "ma27" uncommented even though ' \
-              'you didn\'t install the HSL MA27 linear solver.'
+        print ('You may have left the line "linear_solver" : "ma27" uncommented even though ' \
+              'you didn\'t install the HSL MA27 linear solver.')
         exit(1)
     u[t,:] = optvar["u",0,:]
     iter_time[t] = t1-t0   

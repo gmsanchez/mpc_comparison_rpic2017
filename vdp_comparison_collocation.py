@@ -85,10 +85,9 @@ ode_integrator = dict(x=x,p=u,
 intoptions = {
     "abstol" : 1e-8,
     "reltol" : 1e-8,
-    "tf" : Delta,
 }
 vdp = casadi.integrator("int_ode",
-    "cvodes", ode_integrator, intoptions)
+    "cvodes", ode_integrator, 0, Delta, intoptions)
 
 # Then get nonlinear casadi functions.
 ode_casadi = casadi.Function(
@@ -163,7 +162,7 @@ nlpoptions = {
     "ipopt" : {
         "print_level" : 0,
         "max_cpu_time" : 60,
-        "linear_solver" : "ma27",  # Comment this line if you don't have MA27
+        # "linear_solver" : "ma27",  # Comment this line if you don't have MA27
         "max_iter" : 100,
     },
     "print_time" : False,
@@ -198,10 +197,10 @@ for t in range(Nsim):
         
     t1 = time.time()
     # Print stats.
-    print "%d: %s in %.4f seconds" % (t,status, t1 - t0)
+    print ("%d: %s in %.4f seconds" % (t,status, t1 - t0))
     if status == "Invalid_Option":
-        print 'You may have left the line "linear_solver" : "ma27" uncommented even though ' \
-              'you didn\'t install the HSL MA27 linear solver.'
+        print ('You may have left the line "linear_solver" : "ma27" uncommented even though ' \
+              'you didn\'t install the HSL MA27 linear solver.')
         exit(1)
     u[t,:] = optvar["u",0,:]
     iter_time[t] = t1-t0   
