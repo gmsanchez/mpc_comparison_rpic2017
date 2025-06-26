@@ -103,17 +103,17 @@ iter_time = np.zeros((Nsim, 1))
 
 for t in range(Nsim):
     t0 = time.time()
-    
     opti.set_value(x0_par, x[t, :])
     sol = opti.solve()
-       
     t1 = time.time()
+    status = opti.stats()["return_status"]
     
     # Print stats
-    print(f"{t}: Solved in {t1 - t0:.4f} seconds")
-    
+    print ("%d: %s in %.4f seconds" % (t,status, t1 - t0))
+
     # Store solution
     u[t, :] = sol.value(u_opti[:, 0])
+    # Store elapsed time
     iter_time[t] = t1 - t0
     
     # Simulate
